@@ -61,7 +61,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { fetchUsers, createUser, updateUser, deleteUser } from '@/api/users';
+import { UserService } from '@/api/users';
 
 const users = ref([]);
 const totalItems = ref(0);
