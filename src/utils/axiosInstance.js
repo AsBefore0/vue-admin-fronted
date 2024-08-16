@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useUserStore } from '../stores/userStore'
 
 const axiosInstance = axios.create({
-  baseURL: 'https://localhost:8080', // 替换为你的API基础URL
+  baseURL: 'http://localhost:8080', // 替换为你的API基础URL
   timeout: 5000, // 设置请求超时时间
   headers: {
     'Content-Type': 'application/json',

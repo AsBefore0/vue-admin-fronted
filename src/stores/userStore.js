@@ -8,7 +8,7 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: false, // 是否已登录
   }),
   actions: {
-    login(userData, token) {
+    login(token, userData) {
       this.userInfo = userData
       this.token = token
       this.isAuthenticated = true
@@ -18,5 +18,14 @@ export const useUserStore = defineStore('user', {
       this.token = null
       this.isAuthenticated = false
     },
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'user',
+        storage: localStorage,  // 可以选择 localStorage 或 sessionStorage
+      }
+    ]
   },
 })
