@@ -13,10 +13,12 @@
     <el-button text bg key="primary" type="primary" @click="openDialog('add')"
       >添加用户</el-button
     >
+
     <!-- 批量删除用户的按钮 -->
-    <el-button text bg key="danger" type="danger" @click="openDialog('add')"
+    <el-button text bg key="danger" type="danger" @click="handleDeleteUsers"
       >批量删除</el-button
     >
+
     <el-table
       :data="users"
       stripe
@@ -89,9 +91,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, markRaw } from "vue";
 import { UserService } from "@/api/users";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Delete } from "@element-plus/icons-vue";
 
 const users = ref([]);
 const totalItems = ref(0);
@@ -183,13 +186,15 @@ const saveUser = async () => {
 const handleSelectionChange = (user_list) => {
   delete_user_ids.value = user_list.map((user) => user.id);
 };
+
 // 封装确认对话框的函数
 const confirmDelete = async () => {
   try {
-    await ElMessageBox.confirm("此操作将永久删除该记录, 是否继续?", "提示", {
+    await ElMessageBox.confirm("此操作将永久删除该记录, 是否继续?", "警告", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
       type: "warning",
+      icon: markRaw(Delete),
     });
     // 用户确认删除
     ElMessage({
@@ -207,7 +212,7 @@ const confirmDelete = async () => {
   }
 };
 
-// 用于执行实际删除操作的函数
+// 批量删除的操作
 const handleDeleteUsers = async () => {
   if (delete_user_ids.value.length === 0) {
     return;
