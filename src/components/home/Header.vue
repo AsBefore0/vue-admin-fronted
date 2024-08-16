@@ -20,18 +20,25 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
-  
-  const username = ref('John Doe')
-  const userAvatar = ref('https://via.placeholder.com/40')
-  
+  import { onMounted, ref } from 'vue'
+  import { useUserStore } from '../../stores/userStore';
+  import { useRouter } from 'vue-router'
+  const username = ref('')
+  const userAvatar = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+  const userStore = useUserStore()
+  const router = useRouter()
+
   const profile = () => {
     console.log('进入个人中心')
   }
   
   const logout = () => {
-    console.log('用户已退出登录')
+    userStore.logout()
+    router.push({name: 'Login'})
   }
+  onMounted(() => {
+    username.value = userStore.userInfo.username
+  })
   </script>
   
   <style scoped>
@@ -68,8 +75,9 @@
     align-items: center;
     cursor: pointer;
     color: white;
+    outline: none;
+    border: none;
   }
-  
   .username {
     margin-left: 8px;
     font-size: 20px;

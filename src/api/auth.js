@@ -11,14 +11,13 @@ export const AuthService = {
             throw error
         }
     },
-
-    async logout() {
-        try {
-            const response = await axiosInstance.post('/logout')
-            return response
-        } catch (error) {
-            console.error('登出请求失败:', error)
-            throw error
-        }
-    }
+    // async logout() {
+    //     try {
+    //         const response = await axiosInstance.post('/logout')
+    //         return response
+    //     } catch (error) {
+    //         console.error('登出请求失败:', error)
+    //         throw error
+    //     }
+    // }
 }
