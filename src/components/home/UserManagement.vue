@@ -8,18 +8,42 @@
         @input="handleSearch"
         clearable
       ></el-input>
-      <el-button text bg key = "primary" type="primary" @click="openDialog('add')">添加用户</el-button>
     </div>
-
-    <el-table :data="users" stripe style="width: 100%">
-      <el-table-column prop="id" label="ID" width="50"></el-table-column>
+    <!-- 添加用户的按钮 -->
+    <el-button text bg key="primary" type="primary" @click="openDialog('add')"
+      >添加用户</el-button
+    >
+    <!-- 批量删除用户的按钮 -->
+    <el-button text bg key="danger" type="danger" @click="openDialog('add')"
+      >批量删除</el-button
+    >
+    <el-table
+      :data="users"
+      stripe
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55" />
+      <el-table-column type="index" width="50" />
       <el-table-column prop="name" label="姓名"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="role" label="角色"></el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="openDialog('edit', scope.row)">编辑</el-button>
-          <el-button link  type="danger" size="small" @click="handleDeleteUser(scope.row.id)">删除</el-button>
+          <el-button
+            link
+            type="primary"
+            size="small"
+            @click="openDialog('edit', scope.row)"
+            >编辑</el-button
+          >
+          <el-button
+            link
+            type="danger"
+            size="small"
+            @click="handleDeleteUser(scope.row.id)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -31,10 +55,15 @@
       :page-size="pageSize"
       :total="totalItems"
       @current-change="handlePageChange"
-      class = "custom-pagination"
+      class="custom-pagination"
     ></el-pagination>
-
-    <el-dialog :header="dialogTitle" v-model="isDialogVisible" width="500">
+    <!-- 对话框 -->
+    <el-dialog
+      :header="dialogTitle"
+      v-model="isDialogVisible"
+      width="500"
+      draggable
+    >
       <el-form :model="currentUser">
         <el-form-item label="姓名" :label-width="formLabelWidth">
           <el-input v-model="currentUser.name"></el-input>
@@ -51,58 +80,60 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-        <el-button @click="isDialogVisible = false">取消</el-button>
-        <el-button link type="primary" @click="saveUser">保存</el-button>
-      </div>
-    </template>
+          <el-button @click="isDialogVisible = false">取消</el-button>
+          <el-button link type="primary" @click="saveUser">保存</el-button>
+        </div>
+      </template>
     </el-dialog>
   </el-main>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { UserService } from '@/api/users';
+import { ref, onMounted } from "vue";
+import { UserService } from "@/api/users";
+import { ElMessage } from "element-plus";
 
 const users = ref([]);
 const totalItems = ref(0);
 const currentPage = ref(1);
 const pageSize = ref(8);
-const searchQuery = ref('');
+const searchQuery = ref("");
 const isDialogVisible = ref(false);
-const dialogTitle = ref('添加用户');
+const dialogTitle = ref("添加用户");
+// 对话框的数据
 const currentUser = ref({
   id: null,
-  name: '',
-  email: '',
-  role: ''
+  name: "",
+  email: "",
+  role: "",
 });
-
-const formLabelWidth = '80px';
-
+// 删除用户的id列表
+const delete_user_ids = ref([]);
+const formLabelWidth = "80px";
 // 加载用户数据
 const loadUsers = async () => {
   try {
     const params = {
       page: currentPage.value,
       limit: pageSize.value,
-      search: searchQuery.value
+      search: searchQuery.value,
     };
     // const response = await fetchUsers(params);
     // users.value = response.data;
     // totalItems.value = response.total;
     users.value = [
-      { id: 1, name: '张三', email: '123', role: 'admin' },
-      { id: 2, name: '李四', email: '456', role: 'user' },
-      { id: 3, name: '王五', email: '789', role: 'admin' },
-      { id: 4, name: '赵六', email: '101112', role: 'user' },
-      { id: 5, name: '张三', email: '123', role: 'admin' },
-      { id: 6, name: '李四', email: '456', role: 'user' },
-      { id: 7, name: '王五', email: '789', role: 'admin' },
-      { id: 8, name: '赵六', email: '101112', role: 'user' },
-  ];
-  totalItems.value = 8;
+      { id: 8, name: "张三", email: "123", role: "admin" },
+      { id: 8, name: "李四", email: "456", role: "user" },
+      { id: 8, name: "王五", email: "789", role: "admin" },
+      { id: 8, name: "赵六", email: "101112", role: "user" },
+      { id: 8, name: "张三", email: "123", role: "admin" },
+      { id: 8, name: "李四", email: "456", role: "user" },
+      { id: 8, name: "王五", email: "789", role: "admin" },
+      { id: 8, name: "赵六", email: "101112", role: "user" },
+    ];
+    totalItems.value = 8;
   } catch (error) {
-    console.error('加载用户数据失败', error);
+    console.error("加载用户数据失败", error);
   }
 };
 
@@ -120,13 +151,12 @@ const handlePageChange = (page) => {
 
 // 打开对话框
 const openDialog = (action, user = null) => {
-
-  if (action === 'edit' && user) {
+  if (action === "edit" && user) {
     currentUser.value = { ...user };
-    dialogTitle.value = '编辑用户';
+    dialogTitle.value = "编辑用户";
   } else {
-    currentUser.value = { id: null, name: '', email: '', role: '' };
-    dialogTitle.value = '添加用户';
+    currentUser.value = { id: null, name: "", email: "", role: "" };
+    dialogTitle.value = "添加用户";
   }
   isDialogVisible.value = true;
 };
@@ -145,17 +175,72 @@ const saveUser = async () => {
     }
     isDialogVisible.value = false;
   } catch (error) {
-    console.error('保存用户失败', error);
+    console.error("保存用户失败", error);
+  }
+};
+
+// 选择框
+const handleSelectionChange = (user_list) => {
+  delete_user_ids.value = user_list.map((user) => user.id);
+};
+// 封装确认对话框的函数
+const confirmDelete = async () => {
+  try {
+    await ElMessageBox.confirm("此操作将永久删除该记录, 是否继续?", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+    // 用户确认删除
+    ElMessage({
+      type: "success",
+      message: "删除成功!",
+    });
+    return true; // 返回 true 表示用户确认删除
+  } catch (error) {
+    // 用户取消操作
+    ElMessage({
+      type: "info",
+      message: "已取消删除",
+    });
+    return false; // 返回 false 表示用户取消删除
+  }
+};
+
+// 用于执行实际删除操作的函数
+const handleDeleteUsers = async () => {
+  if (delete_user_ids.value.length === 0) {
+    return;
+  }
+  const confirmed = await confirmDelete();
+  if (confirmed) {
+    console.log("执行删除操作");
+    try {
+      await UserService.deleteUser(delete_user_ids.value);
+      loadUsers(); // 更新列表
+    } catch (error) {
+      ElMessage.error("删除用户失败");
+      console.error("删除用户失败", error);
+    }
+  } else {
+    console.log("删除操作已取消");
   }
 };
 
 // 删除用户
 const handleDeleteUser = async (id) => {
-  try {
-    // await deleteUser(id);
-    loadUsers(); // 更新列表
-  } catch (error) {
-    console.error('删除用户失败', error);
+  const confirmed = await confirmDelete();
+  if (confirmed) {
+    try {
+      const ids = [id];
+      await UserService.deleteUser(ids);
+      loadUsers(); // 更新列表
+    } catch (error) {
+      ElMessage.error("删除用户失败");
+      console.error("删除用户失败", error);
+    }
+  } else {
+    console.log("删除操作已取消");
   }
 };
 
@@ -168,7 +253,7 @@ onMounted(loadUsers);
   display: flex;
   justify-content: space-between;
   align-items: center;
-} 
+}
 .dialog-footer {
   text-align: right;
 }

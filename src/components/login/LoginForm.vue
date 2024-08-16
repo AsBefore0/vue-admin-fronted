@@ -83,7 +83,7 @@ const onSubmit = async () => {
       router.push({ name: 'Home' })
     } catch (error) {
       // 处理登录失败后的逻辑
-      console.error('登录失败:', error)
+      ElMessage.error("登录失败,请检查服务器连接");
     }
   }
 };
