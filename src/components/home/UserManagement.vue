@@ -18,7 +18,7 @@
     <el-button text bg key="danger" type="danger" @click="handleDeleteUsers"
       >批量删除</el-button
     >
-
+    <!-- 用户列表 -->
     <el-table
       :data="users"
       stripe
@@ -27,9 +27,22 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column type="index" width="50" />
-      <el-table-column prop="name" label="姓名"></el-table-column>
+      <el-table-column prop="username" label="姓名"></el-table-column>
+      <el-table-column prop="password" label="密码"></el-table-column>
+      <el-table-column prop="role" label="类型"></el-table-column>
+      <el-table-column prop="gender" label="性别"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
-      <el-table-column prop="role" label="角色"></el-table-column>
+      <el-table-column prop="phone" label="电话"></el-table-column>
+      <el-table-column
+        prop="createdTime"
+        label="创建时间"
+        :formatter="formatDate"
+      ></el-table-column>
+      <el-table-column
+        prop="updatedTime"
+        label="更新时间"
+        :formatter="formatDate"
+      ></el-table-column>
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-button
@@ -59,31 +72,62 @@
       @current-change="handlePageChange"
       class="custom-pagination"
     ></el-pagination>
+
     <!-- 对话框 -->
     <el-dialog
       :header="dialogTitle"
       v-model="isDialogVisible"
       width="500"
       draggable
+      @close="handleDialogClose"
     >
-      <el-form :model="currentUser">
-        <el-form-item label="姓名" :label-width="formLabelWidth">
-          <el-input v-model="currentUser.name"></el-input>
+      <el-form :model="currentUser" :rules="userRules" ref="userForm">
+        <el-form-item
+          label="姓名"
+          :label-width="formLabelWidth"
+          prop="username"
+        >
+          <el-input v-model="currentUser.username"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" :label-width="formLabelWidth">
+        <el-form-item
+          label="密码"
+          :label-width="formLabelWidth"
+          prop="password"
+        >
+          <el-input v-model="currentUser.password"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" :label-width="formLabelWidth" prop="role">
+          <el-select v-model="currentUser.role" placeholder="请选择角色">
+            <el-option label="普通用户" value="0"></el-option>
+            <el-option label="VIP用户" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
+          <el-select v-model="currentUser.gender" placeholder="请选择性别">
+            <el-option label="男" value="0"></el-option>
+            <el-option label="女" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
           <el-input v-model="currentUser.email"></el-input>
         </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth">
-          <el-select v-model="currentUser.role" placeholder="请选择角色">
-            <el-option label="管理员" value="admin"></el-option>
-            <el-option label="用户" value="user"></el-option>
-          </el-select>
+        <el-form-item label="电话" :label-width="formLabelWidth" prop="phone">
+          <el-input v-model="currentUser.phone"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="isDialogVisible = false">取消</el-button>
-          <el-button link type="primary" @click="saveUser">保存</el-button>
+          <el-button
+            text
+            bg
+            key="danger"
+            type="danger"
+            @click="isDialogVisible = false"
+            >取消</el-button
+          >
+          <el-button text bg key="primary" type="primary" @click="saveUser"
+            >保存</el-button
+          >
         </div>
       </template>
     </el-dialog>
@@ -106,10 +150,44 @@ const dialogTitle = ref("添加用户");
 // 对话框的数据
 const currentUser = ref({
   id: null,
-  name: "",
-  email: "",
+  username: "",
+  password: "",
   role: "",
+  gender: "",
+  email: "",
+  phone: "",
 });
+// 验证规则集
+const userRules = {
+  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+  password: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 6, max: 16, message: "密码长度应为6到16个字符", trigger: "blur" },
+    {
+      pattern: /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d\W_]{6,16}$/,
+      message: "密码必须包含字母和数字，且不包含中文字符",
+      trigger: "blur",
+    },
+    { pattern: /^\S+$/, message: "密码不能包含空格", trigger: "blur" },
+  ],
+  email: [
+    {
+      required: true,
+      type: "email",
+      message: "请输入正确的邮箱地址",
+      trigger: "blur",
+    },
+  ],
+  phone: [
+    { required: true, message: "请输入电话号码", trigger: "blur" },
+    {
+      pattern: /^[0-9]{11}$/,
+      message: "电话号码应为11位数字",
+      trigger: "blur",
+    },
+  ],
+};
+
 // 删除用户的id列表
 const delete_user_ids = ref([]);
 const formLabelWidth = "80px";
@@ -125,14 +203,94 @@ const loadUsers = async () => {
     // users.value = response.data;
     // totalItems.value = response.total;
     users.value = [
-      { id: 8, name: "张三", email: "123", role: "admin" },
-      { id: 8, name: "李四", email: "456", role: "user" },
-      { id: 8, name: "王五", email: "789", role: "admin" },
-      { id: 8, name: "赵六", email: "101112", role: "user" },
-      { id: 8, name: "张三", email: "123", role: "admin" },
-      { id: 8, name: "李四", email: "456", role: "user" },
-      { id: 8, name: "王五", email: "789", role: "admin" },
-      { id: 8, name: "赵六", email: "101112", role: "user" },
+      {
+        id: 1,
+        username: "张三",
+        password: "121",
+        role: "0",
+        gender: "0",
+        email: "123@qq.com",
+        phone: "1",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 2,
+        username: "李四",
+        password: "122",
+        role: "0",
+        gender: "0",
+        email: "123@qq.com",
+        phone: "2",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 3,
+        username: "王五",
+        password: "123",
+        role: "1",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "3",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 4,
+        username: "赵六",
+        password: "124",
+        role: "1",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "4",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 5,
+        username: "张三",
+        password: "125",
+        role: "1",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "5",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 6,
+        username: "李四",
+        password: "126",
+        role: "1",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "6",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 7,
+        username: "王五",
+        password: "127",
+        role: "0",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "7",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
+      {
+        id: 8,
+        username: "赵六",
+        password: "128",
+        role: "0",
+        gender: "1",
+        email: "123@qq.com",
+        phone: "8",
+        createdTime: "2023-08-15T14:30:00",
+        updatedTime: "2023-08-15T14:30:00",
+      },
     ];
     totalItems.value = 8;
   } catch (error) {
@@ -152,13 +310,32 @@ const handlePageChange = (page) => {
   loadUsers();
 };
 
+// 表单引用
+const userForm = ref(null);
+// 每次对话框关闭时，清除验证状态和表单数据
+const handleDialogClose = () => {
+  if (userForm.value) {
+    userForm.value.resetFields(); // 重置表单字段
+  }
+};
 // 打开对话框
 const openDialog = (action, user = null) => {
+  if (userForm.value) {
+    userForm.value.resetFields(); // 重置表单字段
+  }
   if (action === "edit" && user) {
     currentUser.value = { ...user };
     dialogTitle.value = "编辑用户";
   } else {
-    currentUser.value = { id: null, name: "", email: "", role: "" };
+    currentUser.value = {
+      id: null,
+      username: "",
+      password: "",
+      role: "",
+      gender: "",
+      email: "",
+      phone: "",
+    };
     dialogTitle.value = "添加用户";
   }
   isDialogVisible.value = true;
@@ -167,18 +344,32 @@ const openDialog = (action, user = null) => {
 // 保存用户
 const saveUser = async () => {
   try {
-    if (currentUser.value.id) {
-      // 编辑用户
-      // await updateUser(currentUser.value.id, currentUser.value);
-      loadUsers(); // 更新列表
-    } else {
-      // 添加新用户
-      // await createUser(currentUser.value);
-      loadUsers(); // 更新列表
+    const userFormRef = userForm.value;
+    const isValid = await userFormRef.validate(); // 使用 async/await 进行表单验证
+    if (isValid) {
+      if (currentUser.value.id) {
+        // 编辑用户
+        console.log(currentUser.value);
+        // await UserService.updateUser(currentUser.value.id, currentUser.value);
+        ElMessage({
+          type: "success",
+          message: "编辑用户成功!",
+        });
+        loadUsers(); // 更新列表
+      } else {
+        // 添加新用户
+        console.log(currentUser.value);
+        // await UserService.createUser(currentUser.value);
+        ElMessage({
+          type: "success",
+          message: "添加用户成功!",
+        });
+        loadUsers(); // 更新列表
+      }
+      isDialogVisible.value = false;
     }
-    isDialogVisible.value = false;
   } catch (error) {
-    console.error("保存用户失败", error);
+    ElMessage.error("保存用户失败");
   }
 };
 
@@ -248,7 +439,18 @@ const handleDeleteUser = async (id) => {
     console.log("删除操作已取消");
   }
 };
-
+// 简单的日期格式化函数
+const formatDate = (row, column, cellValue) => {
+  if (!cellValue) return "";
+  const date = new Date(cellValue);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
 onMounted(loadUsers);
 </script>
 
