@@ -17,15 +17,13 @@ export const UserService = {
             const response = await axiosInstance.post(API_URL, userData)
             return response.data
         } catch (error) {
-            console.error('添加用户失败', error)
             throw error
         }
     },
     async updateUser(id, userData) {
         try {
-            await axiosInstance.put(`${API_URL}/${id}`, userData)
+            await axiosInstance.put(userData)
         } catch (error) {
-            console.error('编辑用户失败', error)
             throw error
         }
     },

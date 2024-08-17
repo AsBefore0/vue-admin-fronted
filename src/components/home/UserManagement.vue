@@ -29,8 +29,18 @@
       <el-table-column type="index" width="50" />
       <el-table-column prop="username" label="姓名"></el-table-column>
       <el-table-column prop="password" label="密码"></el-table-column>
-      <el-table-column prop="role" label="类型"></el-table-column>
-      <el-table-column prop="gender" label="性别"></el-table-column>
+      <el-table-column label="类型">
+        <template #default="scope">
+          <span v-if="scope.row.role === '0'">普通用户</span>
+          <span v-else>VIP用户</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="性别">
+        <template #default="scope">
+          <span v-if="scope.row.gender === '0'">男</span>
+          <span v-else>女</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="phone" label="电话"></el-table-column>
       <el-table-column
@@ -170,6 +180,8 @@ const userRules = {
     },
     { pattern: /^\S+$/, message: "密码不能包含空格", trigger: "blur" },
   ],
+  role: [{ required: true, message: "请选择用户类型", trigger: "blur" }],
+  gender: [{ required: true, message: "请选择性别", trigger: "blur" }],
   email: [
     {
       required: true,
@@ -206,11 +218,11 @@ const loadUsers = async () => {
       {
         id: 1,
         username: "张三",
-        password: "121",
+        password: "121abc",
         role: "0",
         gender: "0",
         email: "123@qq.com",
-        phone: "1",
+        phone: "11111111111",
         createdTime: "2023-08-15T14:30:00",
         updatedTime: "2023-08-15T14:30:00",
       },
@@ -252,7 +264,7 @@ const loadUsers = async () => {
         username: "张三",
         password: "125",
         role: "1",
-        gender: "1",
+        gender: "0",
         email: "123@qq.com",
         phone: "5",
         createdTime: "2023-08-15T14:30:00",
@@ -263,7 +275,7 @@ const loadUsers = async () => {
         username: "李四",
         password: "126",
         role: "1",
-        gender: "1",
+        gender: "0",
         email: "123@qq.com",
         phone: "6",
         createdTime: "2023-08-15T14:30:00",
@@ -350,16 +362,16 @@ const saveUser = async () => {
       if (currentUser.value.id) {
         // 编辑用户
         console.log(currentUser.value);
-        // await UserService.updateUser(currentUser.value.id, currentUser.value);
+        await UserService.updateUser( currentUser.value);
         ElMessage({
           type: "success",
-          message: "编辑用户成功!",
+          message: "更新用户成功!",
         });
         loadUsers(); // 更新列表
       } else {
         // 添加新用户
         console.log(currentUser.value);
-        // await UserService.createUser(currentUser.value);
+        await UserService.createUser(currentUser.value);
         ElMessage({
           type: "success",
           message: "添加用户成功!",
