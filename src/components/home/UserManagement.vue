@@ -135,7 +135,13 @@
             @click="isDialogVisible = false"
             >取消</el-button
           >
-          <el-button text bg key="primary" type="primary" @click="saveUser"
+          <el-button
+            text
+            bg
+            key="primary"
+            type="primary"
+            @click="saveUser"
+            :loading="isSaving"
             >保存</el-button
           >
         </div>
@@ -153,7 +159,7 @@ import { Delete } from "@element-plus/icons-vue";
 const users = ref([]);
 const totalItems = ref(0);
 const currentPage = ref(1);
-const pageSize = ref(8);
+const pageSize = ref(6);
 const searchQuery = ref("");
 const isDialogVisible = ref(false);
 const dialogTitle = ref("添加用户");
@@ -281,30 +287,8 @@ const loadUsers = async () => {
         createdTime: "2023-08-15T14:30:00",
         updatedTime: "2023-08-15T14:30:00",
       },
-      {
-        id: 7,
-        username: "王五",
-        password: "127",
-        role: "0",
-        gender: "1",
-        email: "123@qq.com",
-        phone: "7",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 8,
-        username: "赵六",
-        password: "128",
-        role: "0",
-        gender: "1",
-        email: "123@qq.com",
-        phone: "8",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
     ];
-    totalItems.value = 8;
+    totalItems.value = 6;
   } catch (error) {
     console.error("加载用户数据失败", error);
   }
@@ -353,8 +337,10 @@ const openDialog = (action, user = null) => {
   isDialogVisible.value = true;
 };
 
+const isSaving = ref(false); // 控制按钮的 loading 状态
 // 保存用户
 const saveUser = async () => {
+  isSaving.value = true; // 开始显示按钮的 loading 状态
   try {
     const userFormRef = userForm.value;
     const isValid = await userFormRef.validate(); // 使用 async/await 进行表单验证
@@ -362,7 +348,7 @@ const saveUser = async () => {
       if (currentUser.value.id) {
         // 编辑用户
         console.log(currentUser.value);
-        await UserService.updateUser( currentUser.value);
+        await UserService.updateUser(currentUser.value);
         ElMessage({
           type: "success",
           message: "更新用户成功!",
@@ -382,10 +368,12 @@ const saveUser = async () => {
     }
   } catch (error) {
     ElMessage.error("保存用户失败");
+  } finally {
+    isSaving.value = false; // 请求结束后关闭按钮的 loading 状态
   }
 };
 
-// 选择框
+// 将选择的用户的 id 存储到 delete_user_ids 中
 const handleSelectionChange = (user_list) => {
   delete_user_ids.value = user_list.map((user) => user.id);
 };
