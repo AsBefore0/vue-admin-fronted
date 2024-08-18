@@ -1,9 +1,7 @@
 <template>
-  <ul>
-    <li>查询用户的功能未完善</li>
-    <li>分页功能未完善</li>
-    <li>处理登录过期的设置</li>
-  </ul>
+  <div>
+    <p>欢迎来到我的管理系统</p>
+  </div>
 </template>
 <script setup>
 </script>

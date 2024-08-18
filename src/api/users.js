@@ -21,7 +21,7 @@ export const UserService = {
     },
     async updateUser(userData) {
         try {
-            await axiosInstance.put(userData)
+            await axiosInstance.put(API_URL, userData)
         } catch (error) {
             throw error
         }

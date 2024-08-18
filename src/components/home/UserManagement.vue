@@ -379,13 +379,11 @@ const handleDeleteUsers = async () => {
   }
   const confirmed = await confirmDelete();
   if (confirmed) {
-    console.log("执行删除操作");
     try {
       await UserService.deleteUser(delete_user_ids.value);
       loadUsers(); // 更新列表
     } catch (error) {
       ElMessage.error("删除用户失败");
-      console.error("删除用户失败", error);
     }
   }
 };
@@ -400,10 +398,7 @@ const handleDeleteUser = async (id) => {
       loadUsers(); // 更新列表
     } catch (error) {
       ElMessage.error("删除用户失败");
-      console.error("删除用户失败", error);
     }
-  } else {
-    console.log("删除操作已取消");
   }
 };
 // 简单的日期格式化函数
