@@ -5,7 +5,7 @@ const API_URL = '/users'
 export const UserService = {
     async fetchUsers(params) {
         try {
-            const response = await axiosInstance.get(API_URL, params)
+            const response = await axiosInstance.get(API_URL, { params: params })
             return response.data
         } catch (error) {
             throw error

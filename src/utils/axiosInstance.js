@@ -35,8 +35,9 @@ axiosInstance.interceptors.response.use(
         const userStore = useUserStore()
         userStore.logout() // 清除 Pinia 中的 token 和用户信息
         router.push({ name: 'Login' })
-      }
+      }else{
         throw new Error()
+      }
     }
     return response
   },
@@ -51,7 +52,8 @@ axiosInstance.interceptors.response.use(
     } else if (error.response && error.response.status === 500) {
       console.error('Server error, please try again later.')
     }
-    return Promise.reject(error)
+    // return Promise.reject(error)
+    console.error(error)
   }
 )
 

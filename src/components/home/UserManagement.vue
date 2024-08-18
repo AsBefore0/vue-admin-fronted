@@ -19,9 +19,9 @@
           clearable
           class="input-field"
         >
-          <el-option label="不选择" value=""></el-option>
-          <el-option label="男" value="0"></el-option>
-          <el-option label="女" value="1"></el-option>
+          <el-option label="不选择" :value='null'></el-option>
+          <el-option label="男" :value = "0"></el-option>
+          <el-option label="女" :value = "1"></el-option>
         </el-select>
       </el-form-item>
 
@@ -58,6 +58,7 @@
     <el-table
       :data="users"
       stripe
+      height = "480px"
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
@@ -67,13 +68,13 @@
       <el-table-column prop="password" label="密码"></el-table-column>
       <el-table-column label="类型">
         <template #default="scope">
-          <span v-if="scope.row.role === '0'">普通用户</span>
+          <span v-if="scope.row.role === 0">普通用户</span>
           <span v-else>VIP用户</span>
         </template>
       </el-table-column>
       <el-table-column label="性别">
         <template #default="scope">
-          <span v-if="scope.row.gender === '0'">男</span>
+          <span v-if="scope.row.gender === 0">男</span>
           <span v-else>女</span>
         </template>
       </el-table-column>
@@ -96,6 +97,7 @@
             type="primary"
             size="small"
             @click="openDialog('edit', scope.row)"
+            style="font-size: 14px;"
             >编辑</el-button
           >
           <el-button
@@ -103,6 +105,7 @@
             type="danger"
             size="small"
             @click="handleDeleteUser(scope.row.id)"
+            style="font-size: 14px;"
             >删除</el-button
           >
         </template>
@@ -144,14 +147,14 @@
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth" prop="role">
           <el-select v-model="currentUser.role" placeholder="请选择角色">
-            <el-option label="普通用户" value="0"></el-option>
-            <el-option label="VIP用户" value="1"></el-option>
+            <el-option label="普通用户" :value="0"></el-option>
+            <el-option label="VIP用户" :value="1"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
           <el-select v-model="currentUser.gender" placeholder="请选择性别">
-            <el-option label="男" value="0"></el-option>
-            <el-option label="女" value="1"></el-option>
+            <el-option label="男" :value="0"></el-option>
+            <el-option label="女" :value="1"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
@@ -202,7 +205,7 @@ const dialogTitle = ref("添加用户");
 // 定义搜索条件的响应式对象
 const searchCriteria = ref({
   username: "",
-  gender: "",
+  gender: null,
   createdTime: null,
 });
 
@@ -211,8 +214,8 @@ const currentUser = ref({
   id: null,
   username: "",
   password: "",
-  role: "",
-  gender: "",
+  role: null,
+  gender: null,
   email: "",
   phone: "",
 });
@@ -275,8 +278,8 @@ const handleSearch = () => {
 };
 
 // 分页处理
-const handlePageChange = (page) => {
-  page.value = page;
+const handlePageChange = (newpage) => {
+  page.value = newpage;
   loadUsers();
 };
 
@@ -301,8 +304,8 @@ const openDialog = (action, user = null) => {
       id: null,
       username: "",
       password: "",
-      role: "",
-      gender: "",
+      role: null,
+      gender: null,
       email: "",
       phone: "",
     };
@@ -321,7 +324,6 @@ const saveUser = async () => {
     if (isValid) {
       if (currentUser.value.id) {
         // 编辑用户
-        console.log(currentUser.value);
         await UserService.updateUser(currentUser.value);
         ElMessage({
           type: "success",
@@ -330,7 +332,6 @@ const saveUser = async () => {
         loadUsers(); // 更新列表
       } else {
         // 添加新用户
-        console.log(currentUser.value);
         await UserService.createUser(currentUser.value);
         ElMessage({
           type: "success",
@@ -363,11 +364,6 @@ const confirmDelete = async () => {
     });
     return true; // 返回 true 表示用户确认删除
   } catch (error) {
-    // 用户取消操作
-    ElMessage({
-      type: "info",
-      message: "已取消删除",
-    });
     return false; // 返回 false 表示用户取消删除
   }
 };
