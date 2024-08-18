@@ -2,7 +2,7 @@
   <ul>
     <li>查询用户的功能未完善</li>
     <li>分页功能未完善</li>
-    <li>在发送请求时 使按钮转圈圈</li>
+    <li>处理登录过期的设置</li>
   </ul>
 </template>
 <script setup>

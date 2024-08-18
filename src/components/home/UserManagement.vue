@@ -1,14 +1,50 @@
 <template>
   <el-main>
-    <div class="user-management-header">
-      <el-input
-        placeholder="搜索用户"
-        v-model="searchQuery"
-        prefix-icon="el-icon-search"
-        @input="handleSearch"
-        clearable
-      ></el-input>
-    </div>
+    <el-form :inline="true" label-width="80px" class="user-management-form">
+      <!-- 姓名 -->
+      <el-form-item label="姓名:">
+        <el-input
+          placeholder="请输入姓名"
+          v-model="searchCriteria.username"
+          clearable
+          class="input-field"
+        ></el-input>
+      </el-form-item>
+
+      <!-- 性别 -->
+      <el-form-item label="性别:">
+        <el-select
+          v-model="searchCriteria.gender"
+          placeholder="请选择性别"
+          clearable
+          class="input-field"
+        >
+          <el-option label="不选择" value=""></el-option>
+          <el-option label="男" value="0"></el-option>
+          <el-option label="女" value="1"></el-option>
+        </el-select>
+      </el-form-item>
+
+      <!-- 入职日期 -->
+      <el-form-item label="创建日期:">
+        <el-date-picker
+          v-model="searchCriteria.createdTime"
+          type="date"
+          placeholder="请选择日期"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          clearable
+          class="input-field"
+        ></el-date-picker>
+      </el-form-item>
+
+      <!-- 查询按钮 -->
+      <el-form-item>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+      </el-form-item>
+    </el-form>
+    <!-- 分割线 -->
+    <el-divider style="margin: 10px 0"></el-divider>
     <!-- 添加用户的按钮 -->
     <el-button text bg key="primary" type="primary" @click="openDialog('add')"
       >添加用户</el-button
@@ -76,7 +112,7 @@
       v-if="totalItems > 0"
       background
       layout="total, prev, pager, next, jumper"
-      :current-page="currentPage"
+      :current-page="page"
       :page-size="pageSize"
       :total="totalItems"
       @current-change="handlePageChange"
@@ -158,11 +194,18 @@ import { Delete } from "@element-plus/icons-vue";
 
 const users = ref([]);
 const totalItems = ref(0);
-const currentPage = ref(1);
+const page = ref(1);
 const pageSize = ref(6);
-const searchQuery = ref("");
 const isDialogVisible = ref(false);
 const dialogTitle = ref("添加用户");
+
+// 定义搜索条件的响应式对象
+const searchCriteria = ref({
+  username: "",
+  gender: "",
+  createdTime: null,
+});
+
 // 对话框的数据
 const currentUser = ref({
   id: null,
@@ -213,96 +256,27 @@ const formLabelWidth = "80px";
 const loadUsers = async () => {
   try {
     const params = {
-      page: currentPage.value,
-      limit: pageSize.value,
-      search: searchQuery.value,
+      page: page.value,
+      pageSize: pageSize.value,
+      ...searchCriteria.value,
     };
-    // const response = await fetchUsers(params);
-    // users.value = response.data;
-    // totalItems.value = response.total;
-    users.value = [
-      {
-        id: 1,
-        username: "张三",
-        password: "121abc",
-        role: "0",
-        gender: "0",
-        email: "123@qq.com",
-        phone: "11111111111",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 2,
-        username: "李四",
-        password: "122",
-        role: "0",
-        gender: "0",
-        email: "123@qq.com",
-        phone: "2",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 3,
-        username: "王五",
-        password: "123",
-        role: "1",
-        gender: "1",
-        email: "123@qq.com",
-        phone: "3",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 4,
-        username: "赵六",
-        password: "124",
-        role: "1",
-        gender: "1",
-        email: "123@qq.com",
-        phone: "4",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 5,
-        username: "张三",
-        password: "125",
-        role: "1",
-        gender: "0",
-        email: "123@qq.com",
-        phone: "5",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-      {
-        id: 6,
-        username: "李四",
-        password: "126",
-        role: "1",
-        gender: "0",
-        email: "123@qq.com",
-        phone: "6",
-        createdTime: "2023-08-15T14:30:00",
-        updatedTime: "2023-08-15T14:30:00",
-      },
-    ];
-    totalItems.value = 6;
+    const response = await UserService.fetchUsers(params);
+    users.value = response.data.rows;
+    totalItems.value = response.data.total;
   } catch (error) {
-    console.error("加载用户数据失败", error);
+    ElMessage.error("加载用户数据失败");
   }
 };
 
 // 搜索用户
 const handleSearch = () => {
-  currentPage.value = 1; // 搜索时重置到第一页
+  page.value = 1; // 搜索时重置到第一页
   loadUsers();
 };
 
 // 分页处理
 const handlePageChange = (page) => {
-  currentPage.value = page;
+  page.value = page;
   loadUsers();
 };
 
@@ -387,11 +361,6 @@ const confirmDelete = async () => {
       type: "warning",
       icon: markRaw(Delete),
     });
-    // 用户确认删除
-    ElMessage({
-      type: "success",
-      message: "删除成功!",
-    });
     return true; // 返回 true 表示用户确认删除
   } catch (error) {
     // 用户取消操作
@@ -418,8 +387,6 @@ const handleDeleteUsers = async () => {
       ElMessage.error("删除用户失败");
       console.error("删除用户失败", error);
     }
-  } else {
-    console.log("删除操作已取消");
   }
 };
 
@@ -455,12 +422,17 @@ onMounted(loadUsers);
 </script>
 
 <style scoped>
-.user-management-header {
-  margin-bottom: 20px;
+.user-management-form {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: flex-start;
+  gap: 20px; /* 使用 gap 控制元素间距 */
+  height: 50px; /* 调整表单的高度 */
 }
+.input-field {
+  width: 200px;
+}
+
 .dialog-footer {
   text-align: right;
 }

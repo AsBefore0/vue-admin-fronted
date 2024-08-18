@@ -32,7 +32,11 @@
         </el-form-item>
         <el-form-item>
           <div class="button-container">
-            <el-button type="primary" @click="onSubmit" class="submit-button"
+            <el-button
+              type="primary"
+              @click="onSubmit"
+              class="submit-button"
+              :loading="isLoging"
               >提交</el-button
             >
             <el-button @click="onReset" class="reset-button">重置</el-button>
@@ -61,6 +65,7 @@ const form = ref({
   password: "",
 });
 const loginForm = ref(null);
+const isLoging = ref(false);
 const userStore = useUserStore();
 const router = useRouter();
 const onSubmit = async () => {
@@ -68,22 +73,26 @@ const onSubmit = async () => {
     ElMessage.error("用户名和密码不能为空");
     return false;
   } else {
+    isLoging.value = true;
     try {
-      const response = await AuthService.login(form.value.username, form.value.password)
+      const response = await AuthService.login(
+        form.value.username,
+        form.value.password
+      );
       // 登录成功后，将 token 和用户信息存储到 Pinia 中
-      if(response.data.data){
-        console.log(response.data);
-        userStore.login(response.data.data, { username: form.value.username});
-      }
-      else{
+      if (response.data.data) {
+        userStore.login(response.data.data, { username: form.value.username });
+      } else {
         ElMessage.error("用户名或密码错误");
         return false;
       }
       // 跳转到主页
-      router.push({ name: 'Home' })
+      router.push({ name: "Home" });
     } catch (error) {
       // 处理登录失败后的逻辑
       ElMessage.error("登录失败,请检查服务器连接");
+    }finally{
+      isLoging.value = false;
     }
   }
 };

@@ -1,13 +1,14 @@
-// src/utils/axiosInstance.js
 import axios from 'axios'
+import { ElMessage } from 'element-plus' // 导入 ElMessage
 import { useUserStore } from '../stores/userStore'
-
+import router from '../router' // 导入路由实例
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8080', // 替换为你的API基础URL
   timeout: 5000, // 设置请求超时时间
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,  // 跨域请求携带凭证
 })
 
 // 请求拦截器
@@ -27,7 +28,16 @@ axiosInstance.interceptors.request.use(
 // 响应拦截器
 axiosInstance.interceptors.response.use(
   response => {
-    // 对响应数据做点什么
+    if (response.data.code === 0) {
+      if (response.data.msg === "NOT_LOGIN") {
+        // 处理未登录的情况
+        ElMessage.error('登录已过期,请重新登录')
+        const userStore = useUserStore()
+        userStore.logout() // 清除 Pinia 中的 token 和用户信息
+        router.push({ name: 'Login' })
+      }
+        throw new Error()
+    }
     return response
   },
   error => {
@@ -36,15 +46,11 @@ axiosInstance.interceptors.response.use(
       // 处理未授权的情况
       const userStore = useUserStore()
       userStore.logout() // 清除 Pinia 中的 token 和用户信息
-      console.error('Unauthorized, redirecting to login...')
-
-      // 你可以选择使用 router 进行重定向，而不是 window.location
+      // 使用 router 进行重定向
       router.push({ name: 'Login' })
     } else if (error.response && error.response.status === 500) {
       console.error('Server error, please try again later.')
-      // 处理 500 错误，显示提示信息或者其他操作
     }
-
     return Promise.reject(error)
   }
 )

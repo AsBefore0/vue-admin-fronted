@@ -3,7 +3,8 @@ import { useUserStore } from '../stores/userStore'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import UserManagement from '../components/home/UserManagement.vue'
-import DashBoard from '../components/home/DashBoard.vue'
+import DashBoard from '../components/home/Dashboard.vue'
+import RoleManagement from '../components/home/RoleManagement.vue'
 
 const routes = [
     {
@@ -23,6 +24,11 @@ const routes = [
                 path: 'dashboard',
                 name: 'Dashboard',
                 component: DashBoard,
+            },
+            {
+                path: 'role',
+                name: 'RoleManagement',
+                component: RoleManagement,
             }
         ],
     },

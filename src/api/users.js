@@ -5,10 +5,9 @@ const API_URL = '/users'
 export const UserService = {
     async fetchUsers(params) {
         try {
-            const response = await axiosInstance.get(API_URL, { params })
+            const response = await axiosInstance.get(API_URL, params)
             return response.data
         } catch (error) {
-            console.error('获取用户数据失败', error)
             throw error
         }
     },
@@ -20,7 +19,7 @@ export const UserService = {
             throw error
         }
     },
-    async updateUser(id, userData) {
+    async updateUser(userData) {
         try {
             await axiosInstance.put(userData)
         } catch (error) {
