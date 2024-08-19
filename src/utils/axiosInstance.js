@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
       console.error('Server error, please try again later.')
     }
     // return Promise.reject(error)
-    console.error(error)
+    ElMessage.error('请求出错，请稍后重试')
   }
 )
 
