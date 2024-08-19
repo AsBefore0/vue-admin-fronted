@@ -19,9 +19,8 @@
           clearable
           class="input-field"
         >
-          <el-option label="不选择" :value='null'></el-option>
-          <el-option label="男" :value = "0"></el-option>
-          <el-option label="女" :value = "1"></el-option>
+          <el-option label="男" :value="0"></el-option>
+          <el-option label="女" :value="1"></el-option>
         </el-select>
       </el-form-item>
 
@@ -58,7 +57,7 @@
     <el-table
       :data="users"
       stripe
-      height = "480px"
+      height="480px"
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
@@ -97,7 +96,7 @@
             type="primary"
             size="small"
             @click="openDialog('edit', scope.row)"
-            style="font-size: 14px;"
+            style="font-size: 14px"
             >编辑</el-button
           >
           <el-button
@@ -105,7 +104,7 @@
             type="danger"
             size="small"
             @click="handleDeleteUser(scope.row.id)"
-            style="font-size: 14px;"
+            style="font-size: 14px"
             >删除</el-button
           >
         </template>
