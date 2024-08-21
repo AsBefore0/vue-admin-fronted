@@ -1,10 +1,23 @@
 <template>
   <div class="custom-header">
     <el-button @click="handleChangeDark">
-      {{ isDark ? "🌙 暗黑模式" : "🌞 浅色模式" }}
+      {{ isDark ? $t("darkMode") : $t("lightMode") }}
     </el-button>
     <!-- 占位符，用于将标题居中 -->
-    <div class="title">信息管理系统</div>
+    <el-config-provider :locale="elementLocale">
+      <div class="spacer">
+        <el-select
+          v-model="selectedLanguage"
+          @change="switchLanguage"
+          placeholder="Select Language"
+          style="width: 90px; margin-left: 20px"
+        >
+          <el-option label="English" value="en"></el-option>
+          <el-option label="中文" value="zh"></el-option>
+        </el-select>
+      </div>
+    </el-config-provider>
+    <div class="title">{{ $t("title") }}</div>
     <div class="user-info">
       <el-dropdown>
         <span class="el-dropdown-link">
@@ -13,8 +26,12 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="profile">个人中心</el-dropdown-item>
-            <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+            <el-dropdown-item @click="profile">{{
+              $t("dropdown.profile")
+            }}</el-dropdown-item>
+            <el-dropdown-item @click="logout">{{
+              $t("dropdown.logout")
+            }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -23,10 +40,12 @@
 </template>
   
   <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, computed, ref } from "vue";
 import { useUserStore } from "../../stores/userStore";
 import { useRouter } from "vue-router";
-import { useDark, useToggle } from '@vueuse/core'
+import { useDark, useToggle } from "@vueuse/core";
+import { useLocaleStore } from "../../stores/locale";
+import { useI18n } from "vue-i18n";
 const username = ref("");
 const userAvatar = ref(
   "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
@@ -34,11 +53,23 @@ const userAvatar = ref(
 const userStore = useUserStore();
 const router = useRouter();
 
-const isDark = useDark()
-const toggleDarkMode = useToggle(isDark)
+const localeStore = useLocaleStore();
+const { locale } = useI18n();
+const elementLocale = computed(() => localeStore.elementLocale);
+const selectedLanguage = ref(localeStore.locale);
+
+// 切换语言函数
+const switchLanguage = (lang) => {
+  localeStore.setLocale(lang);
+  locale.value = lang;
+  selectedLanguage.value = lang; // 更新下拉框选项
+};
+
+const isDark = useDark();
+const toggleDarkMode = useToggle(isDark);
 const handleChangeDark = () => {
-  toggleDarkMode()
-}
+  toggleDarkMode();
+};
 
 const profile = () => {
   console.log("进入个人中心");
@@ -67,7 +98,7 @@ onMounted(() => {
   background-color: #202126;
   color: #fff;
 }
-.dark .title{
+.dark .title {
   color: #fff;
 }
 .spacer {

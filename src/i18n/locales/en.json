@@ -1,0 +1,60 @@
+{
+    "title": "Management System",
+    "content": "Welcome to my management system",
+    "searchheader":{
+      "button": "search",
+      "name": "name",
+      "gender":"gender",
+      "password": "password",
+      "type": "type",
+      "email":"email",
+      "phone":"phone",
+      "time" : "createdate",
+      "m_name": "please input name",
+      "m_gender": "please select gender",
+      "m_role": "please select type",
+      "m_time" : "please select create date"
+    },
+    "button": {
+      "add": "Add User",
+      "delete": "Batch Delete",
+      "edit": "Edit",
+      "del": "Delete",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "table":{
+      "name": "Name",
+      "password": "Password",
+      "type": "Type",
+      "gender":"Gender",
+      "email":"Email",
+      "phone":"Phone",
+      "create":"CreateDate",
+      "update":"UpdateDate",
+      "operation":"Operation"
+    },
+    "option":{
+      "male":"male",
+      "female":"female",
+      "common":"common user",
+      "vip":"vip user"
+    },
+    "menu":{
+      "home":"Home",
+      "manage":"Manage",
+      "user":"User Manage",
+      "role":"Role Manage"
+    },
+    "darkMode": "🌙 Dark Mode",
+    "lightMode": "🌞 Light Mode",
+    "welcome":{
+      "content1":"Welcome to the",
+      "content2":"Management System"
+    },
+    "dropdown":{
+      "profile":"Profile",
+      "logout":"Logout"
+    }
+  }
+  

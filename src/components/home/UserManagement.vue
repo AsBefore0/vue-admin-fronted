@@ -2,9 +2,9 @@
   <el-main>
     <el-form :inline="true" label-width="80px" class="user-management-form">
       <!-- 姓名 -->
-      <el-form-item label="姓名:">
+      <el-form-item :label="$t('searchheader.name')">
         <el-input
-          placeholder="请输入姓名"
+          :placeholder="$t('searchheader.m_name')"
           v-model="searchCriteria.username"
           clearable
           class="input-field"
@@ -12,24 +12,24 @@
       </el-form-item>
 
       <!-- 性别 -->
-      <el-form-item label="性别:">
+      <el-form-item :label="$t('searchheader.gender')">
         <el-select
           v-model="searchCriteria.gender"
-          placeholder="请选择性别"
+          :placeholder="$t('searchheader.m_gender')"
           clearable
           class="input-field"
         >
-          <el-option label="男" :value="0"></el-option>
-          <el-option label="女" :value="1"></el-option>
+          <el-option :label="$t('option.male')" :value="0"></el-option>
+          <el-option :label="$t('option.female')" :value="1"></el-option>
         </el-select>
       </el-form-item>
 
       <!-- 入职日期 -->
-      <el-form-item label="创建日期:">
+      <el-form-item :label="$t('searchheader.time')">
         <el-date-picker
           v-model="searchCriteria.createdTime"
           type="date"
-          placeholder="请选择日期"
+          :placeholder="$t('searchheader.m_time')"
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           clearable
@@ -39,20 +39,27 @@
 
       <!-- 查询按钮 -->
       <el-form-item>
-        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button type="primary" @click="handleSearch">{{
+          $t("searchheader.button")
+        }}</el-button>
       </el-form-item>
     </el-form>
     <!-- 分割线 -->
     <el-divider style="margin: 10px 0"></el-divider>
     <!-- 添加用户的按钮 -->
-    <el-button text bg key="primary" type="primary" @click="openDialog('add')"
-      >添加用户</el-button
+    <el-button
+      text
+      bg
+      key="primary"
+      type="primary"
+      @click="openDialog('add')"
+      >{{ $t("button.add") }}</el-button
     >
 
     <!-- 批量删除用户的按钮 -->
-    <el-button text bg key="danger" type="danger" @click="handleDeleteUsers"
-      >批量删除</el-button
-    >
+    <el-button text bg key="danger" type="danger" @click="handleDeleteUsers">{{
+      $t("button.delete")
+    }}</el-button>
     <!-- 用户列表 -->
     <el-table
       :data="users"
@@ -63,33 +70,45 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column type="index" width="50" />
-      <el-table-column prop="username" label="姓名"></el-table-column>
-      <el-table-column prop="password" label="密码"></el-table-column>
-      <el-table-column label="类型">
+      <el-table-column
+        prop="username"
+        :label="$t('table.name')"
+      ></el-table-column>
+      <el-table-column
+        prop="password"
+        :label="$t('table.password')"
+      ></el-table-column>
+      <el-table-column :label="$t('table.type')">
         <template #default="scope">
-          <span v-if="scope.row.role === 0">普通用户</span>
-          <span v-else>VIP用户</span>
+          <span v-if="scope.row.role === 0">{{ $t("option.common") }}</span>
+          <span v-else>{{ $t("option.vip") }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="性别">
+      <el-table-column :label="$t('table.gender')">
         <template #default="scope">
-          <span v-if="scope.row.gender === 0">男</span>
-          <span v-else>女</span>
+          <span v-if="scope.row.gender === 0">{{ $t("option.male") }}</span>
+          <span v-else>{{ $t("option.female") }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="email" label="邮箱"></el-table-column>
-      <el-table-column prop="phone" label="电话"></el-table-column>
+      <el-table-column
+        prop="email"
+        :label="$t('table.email')"
+      ></el-table-column>
+      <el-table-column
+        prop="phone"
+        :label="$t('table.phone')"
+      ></el-table-column>
       <el-table-column
         prop="createdTime"
-        label="创建时间"
+        :label="$t('table.create')"
         :formatter="formatDate"
       ></el-table-column>
       <el-table-column
         prop="updatedTime"
-        label="更新时间"
+        :label="$t('table.update')"
         :formatter="formatDate"
       ></el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column :label="$t('table.operation')" width="200">
         <template #default="scope">
           <el-button
             link
@@ -97,7 +116,7 @@
             size="small"
             @click="openDialog('edit', scope.row)"
             style="font-size: 14px"
-            >编辑</el-button
+            >{{ $t("button.edit") }}</el-button
           >
           <el-button
             link
@@ -105,7 +124,7 @@
             size="small"
             @click="handleDeleteUser(scope.row.id)"
             style="font-size: 14px"
-            >删除</el-button
+            >{{ $t("button.del") }}</el-button
           >
         </template>
       </el-table-column>
@@ -131,35 +150,35 @@
     >
       <el-form :model="currentUser" :rules="userRules" ref="userForm">
         <el-form-item
-          label="姓名"
+          :label="$t('searchheader.name')"
           :label-width="formLabelWidth"
           prop="username"
         >
           <el-input v-model="currentUser.username"></el-input>
         </el-form-item>
         <el-form-item
-          label="密码"
+          :label="$t('searchheader.password')"
           :label-width="formLabelWidth"
           prop="password"
         >
           <el-input v-model="currentUser.password"></el-input>
         </el-form-item>
-        <el-form-item label="类型" :label-width="formLabelWidth" prop="role">
-          <el-select v-model="currentUser.role" placeholder="请选择角色">
-            <el-option label="普通用户" :value="0"></el-option>
-            <el-option label="VIP用户" :value="1"></el-option>
+        <el-form-item :label="$t('searchheader.type')" :label-width="formLabelWidth" prop="role">
+          <el-select v-model="currentUser.role" :placeholder="$t('searchheader.m_role')">
+            <el-option :label="$t('option.common')" :value="0"></el-option>
+            <el-option :label="$t('option.vip')" :value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
-          <el-select v-model="currentUser.gender" placeholder="请选择性别">
-            <el-option label="男" :value="0"></el-option>
-            <el-option label="女" :value="1"></el-option>
+        <el-form-item :label="$t('searchheader.gender')" :label-width="formLabelWidth" prop="gender">
+          <el-select v-model="currentUser.gender" :placeholder="$t('searchheader.m_gender')">
+            <el-option :label="$t('option.male')" :value="0"></el-option>
+            <el-option :label="$t('option.female')" :value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
+        <el-form-item :label="$t('searchheader.email')" :label-width="formLabelWidth" prop="email">
           <el-input v-model="currentUser.email"></el-input>
         </el-form-item>
-        <el-form-item label="电话" :label-width="formLabelWidth" prop="phone">
+        <el-form-item :label="$t('searchheader.phone')" :label-width="formLabelWidth" prop="phone">
           <el-input v-model="currentUser.phone"></el-input>
         </el-form-item>
       </el-form>
@@ -171,7 +190,7 @@
             key="danger"
             type="danger"
             @click="isDialogVisible = false"
-            >取消</el-button
+            >{{$t('button.cancel')}}</el-button
           >
           <el-button
             text
@@ -180,7 +199,7 @@
             type="primary"
             @click="saveUser"
             :loading="isSaving"
-            >保存</el-button
+            >{{$t('button.save')}}</el-button
           >
         </div>
       </template>

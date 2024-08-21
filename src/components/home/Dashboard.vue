@@ -1,6 +1,6 @@
 <template>
   <div class="welcome-container">
-    <p>欢迎来到我的管理系统</p>
+    <p>{{ $t("content") }}</p>
   </div>
 </template>
 

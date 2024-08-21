@@ -11,19 +11,19 @@
         >
           <el-menu-item index="1" @click="navigateTo('/dashboard')">
             <el-icon><icon-menu /></el-icon>
-            <span class="title">首页</span>
+            <span class="title">{{ $t("menu.home") }}</span>
           </el-menu-item>
           <el-sub-menu index="2">
             <template #title>
               <el-icon><location /></el-icon>
-              <span class="title">管理</span>
+              <span class="title">{{ $t("menu.manage") }}</span>
             </template>
-            <el-menu-item index="2-1" @click="navigateTo('/user')"
-              >用户管理</el-menu-item
-            >
-            <el-menu-item index="2-2" @click="navigateTo('/role')"
-              >角色管理</el-menu-item
-            >
+            <el-menu-item index="2-1" @click="navigateTo('/user')">{{
+              $t("menu.user")
+            }}</el-menu-item>
+            <el-menu-item index="2-2" @click="navigateTo('/role')">{{
+              $t("menu.role")
+            }}</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-col>
