@@ -1,5 +1,5 @@
 <template>
-  <div class="common-layout">
+  <div>
     <el-container>
       <Menu />
       <el-container>
@@ -21,9 +21,7 @@ import Header from '@/components/home/Header.vue'
 import Show from '@/views/Show.vue'
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router'
-
 const router = useRouter()
-
 onMounted(() => {
   router.push('/dashboard')
 })

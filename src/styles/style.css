@@ -1,0 +1,19 @@
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Custom element styles for dark mode */
+.dark a {
+  color: #bb86fc;
+}
+
+.dark .custom-element {
+  border: 1px solid #333;
+  background-color: #1e1e1e;
+  color: #fff;
+}
